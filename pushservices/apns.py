@@ -4,7 +4,7 @@
 from . import PushService
 from util import json_encode
 import logging
-import hyper
+from hyper import HTTPConnection
 import jwt
 import time
 
@@ -32,7 +32,7 @@ class ApnsClient(PushService):
         self.instanceid = kwargs["instanceid"]
         self.last_token_refresh = 0
         self.token = None
-        self.http2 = hyper.HTTPConnection(BASE_URL_PROD)
+        self.http2 = HTTPConnection(BASE_URL_PROD)
         #  self.http2dev = hyper.HTTPConnection(BASE_URL_DEV)
 
     def create_token(self):
