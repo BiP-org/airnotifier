@@ -72,9 +72,6 @@ class FCMClient(PushService):
         if alert:
             payload["message"]["notification"] = self.format_values(alert)
 
-        if data:
-            payload["message"]["data"] = self.format_values(data)
-
         if android:
             payload["message"]["android"] = android
 
