@@ -12,6 +12,8 @@ def process_pushnotification_payload(data):
     message = extra.get("smallmessage", None)
     notif = extra.get("notification", None)
     title = extra.get("sitefullname", None)
+    extra["notif"] = notif
+    del extra["notification"]
 
     if not message:
         message = extra.get("fullmessage", None)
