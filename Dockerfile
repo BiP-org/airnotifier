@@ -15,7 +15,7 @@ RUN echo "debconf debconf/frontend select ${DEBIAN_FRONTEND}" | debconf-set-sele
     && debconf-show debconf
 
 RUN apt-get update -q -y && \
-    apt-get install -q -y --no-install-recommends git ca-certificates python3-dev python3
+    apt-get install -q -y --no-install-recommends git ca-certificates python3-dev python3 python3-dns
 
 
 RUN pip3 install pipenv
