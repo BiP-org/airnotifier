@@ -32,7 +32,7 @@ class ApnsClient(PushService):
         self.instanceid = kwargs["instanceid"]
         self.last_token_refresh = 0
         self.token = None
-        self.http2 = httpx.Client(http2=True, base_url="https://api.push.apple.com")
+        self.http2 = httpx.Client(http2=True, base_url=f"https://{BASE_URL_PROD}")
         #  self.http2dev = hyper.HTTPConnection(BASE_URL_DEV)
 
     def create_token(self):
@@ -47,7 +47,7 @@ class ApnsClient(PushService):
                 headers={"alg": ALGORITHM, "kid": self.key_id},
             )
             self.last_token_refresh = now
-            self.token = token.decode("ascii")
+            self.token = token
         return self.token
 
     def build_headers(self, push_type="alert"):
