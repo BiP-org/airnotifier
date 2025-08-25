@@ -33,7 +33,7 @@ first ```docker volume ls``` and ```docker volume rm ....```
 
 ## Requirements
 
-- [Python 3.9](http://www.python.org)
+- [Python 3.11](http://www.python.org)
 - [MongoDB 4.0+](http://www.mongodb.org/)
 
 ## Copyright

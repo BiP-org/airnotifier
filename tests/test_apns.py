@@ -6,35 +6,29 @@ from unittest.mock import MagicMock, patch
 from util import json_decode
 
 
-def mocked_http2(*args, **kwargs):
+def mocked_httpx_client(*args, **kwargs):
     class Response:
         def __init__(self):
-            self.status = 200
+            self.status_code = 200
+            self.text = "{}"
 
-        def read(self):
-            return b"{}"
-
-    class HTTP2:
-        def request(self, method, path, payload, **kwargs):
+    class HTTPXClient:
+        def __init__(self, *args, **kwargs):
             pass
 
-        def get_response(self):
+        def post(self, path, content, headers):
             return Response()
 
-    return HTTP2()
+    return HTTPXClient()
 
 
 def mocked_jwt_encode(*args, **kwargs):
-    class Token:
-        def decode(self, string):
-            return "encode_jwt"
-
-    return Token()
+    return "encode_jwt"
 
 
 class TestAPNS(unittest.TestCase):
     @patch("jwt.encode", side_effect=mocked_jwt_encode)
-    @patch("hyper.HTTPConnection", side_effect=mocked_http2)
+    @patch("httpx.Client", side_effect=mocked_httpx_client)
     def test_apns(self, jwt, req):
         self.maxDiff = None
         kwargs = {
@@ -47,6 +41,10 @@ class TestAPNS(unittest.TestCase):
             "instanceid": "",
         }
         apns = ApnsClient(**kwargs)
+        # Reset token cache to ensure mock is used
+        apns.token = None
+        apns.last_token_refresh = 0
+        
         apns_default = {"badge": None, "sound": "default", "push_type": "alert"}
         apns.process(
             token="aaa", alert="alert", apns={**apns_default, **{"badge": 12}},
@@ -66,6 +64,11 @@ class TestAPNS(unittest.TestCase):
             apns.payload,
             '{"aps": {"alert": {"body": "alert", "title": "alert"}, "badge": 12, "sound": "default"}}',
         )
+        
+        # Reset token cache again for second call
+        apns.token = None
+        apns.last_token_refresh = 0
+        
         apns.process(
             token="aaa",
             alert="alert",

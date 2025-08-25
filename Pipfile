@@ -3,6 +3,9 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[requires]
+python_version = "3.11"
+
 [scripts]
 test = "python -m unittest discover -s tests -p 'test_*.py'"
 
@@ -17,6 +20,6 @@ tornado = "~=6.4.0"
 click = "*"
 sentry-sdk = "==0.13.2"
 aiocontextvars = "*"
-hyper = "*"
 pyjwt = "*"
 cryptography = "*"
+httpx = "*"

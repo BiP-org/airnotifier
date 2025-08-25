@@ -4,7 +4,7 @@
 from . import PushService
 from util import json_encode
 import logging
-import hyper
+import httpx
 import jwt
 import time
 
@@ -32,7 +32,7 @@ class ApnsClient(PushService):
         self.instanceid = kwargs["instanceid"]
         self.last_token_refresh = 0
         self.token = None
-        self.http2 = hyper.HTTPConnection(BASE_URL_PROD)
+        self.http2 = httpx.Client(http2=True, base_url=f"https://{BASE_URL_PROD}")
         #  self.http2dev = hyper.HTTPConnection(BASE_URL_DEV)
 
     def create_token(self):
@@ -47,7 +47,7 @@ class ApnsClient(PushService):
                 headers={"alg": ALGORITHM, "kid": self.key_id},
             )
             self.last_token_refresh = now
-            self.token = token.decode("ascii")
+            self.token = token
         return self.token
 
     def build_headers(self, push_type="alert"):
@@ -92,13 +92,9 @@ class ApnsClient(PushService):
         PATH = "/3/device/{0}".format(token)
         self.headers = self.build_headers(push_type=apns["push_type"])
 
-        self.http2.request("POST", PATH, self.payload, headers=self.headers)
-        resp = self.http2.get_response()
+        resp = self.http2.post(PATH, content=self.payload, headers=self.headers)
 
-        if resp.status >= 400:
-            #  headers = resp.headers
-            #  for k, v in headers.items():
-            #      logging.error("%s: %s" % (k.decode("utf-8"), v.decode("utf-8")))
-            body = resp.read().decode("utf-8")
+        if resp.status_code >= 400:
+            body = resp.text
             logging.error(body)
             raise ApnsException(400, body)
